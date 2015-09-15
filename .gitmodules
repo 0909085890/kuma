@@ -21,7 +21,7 @@
 	url = git://github.com/jezdez/django-appconf.git
 [submodule "vendor/src/django-constance"]
 	path = vendor/src/django-constance
-	url = git://github.com/comoga/django-constance.git
+	url = git://github.com/jezdez/django-constance.git
 [submodule "vendor/src/django-extensions"]
 	path = vendor/src/django-extensions
 	url = git://github.com/django-extensions/django-extensions.git
@@ -164,3 +164,9 @@
 [submodule "vendor/src/django-sundial"]
 	path = vendor/src/django-sundial
 	url = https://github.com/charettes/django-sundial
+[submodule "vendor/src/responses"]
+	path = vendor/src/responses
+	url = https://github.com/getsentry/responses.git
+[submodule "vendor/src/cookies"]
+	path = vendor/src/cookies
+	url = https://github.com/sashahart/cookies.git
