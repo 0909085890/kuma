@@ -23,6 +23,7 @@ from waffle.models import Flag
 from kuma.core.tests import SkippedTestCase, post, get
 from kuma.core.urlresolvers import reverse
 from kuma.users.tests import UserTestCase
+from ..apps import WikiConfig
 from ..events import EditDocumentEvent
 from ..constants import REDIRECT_CONTENT, TEMPLATE_TITLE_PREFIX
 from ..models import Document, Revision, HelpfulVote, DocumentTag
@@ -740,6 +741,33 @@ class CompareRevisionTests(UserTestCase, WikiTestCase):
         url = urlparams(url, **query)
         response = self.client.get(url)
         eq_(404, response.status_code)
+
+    @mock.patch.object(WikiConfig, 'on_revision_save')
+    def test_no_tidied_content(self, tidy_revision_content):
+        """
+        Verify revisions without tidied content show appropriate message.
+        """
+        tidy_revision_content.return_value = None
+
+        user = self.user_model.objects.get(username='testuser')
+        doc = _create_document(title='Test no tidied content compare')
+        rev1 = doc.current_revision
+        rev2 = Revision(summary="test no tidied content",
+                        content='mocked on_revision_save',
+                        document=doc, creator=user)
+        rev2.save()
+
+        url = reverse('wiki.compare_revisions', args=[doc.slug])
+        query = {'from': rev1.id, 'to': rev2.id}
+        url = urlparams(url, **query)
+        response = self.client.get(url)
+        eq_(200, response.status_code)
+        ok_('Please refresh this page in a few minutes.' in response.content)
+
+        url = url + '&raw=1'
+        response = self.client.get(url)
+        eq_(200, response.status_code)
+        ok_('Please refresh this page in a few minutes.' in response.content)
 
     def test_compare_revisions(self):
         """Compare two revisions"""
